@@ -41,7 +41,6 @@ const observer = new IntersectionObserver(onLoad);
 function loadMore() {
   getPhotosByWord()
     .then(({ res, page }) => {
-      console.log(page);
       currentPage = page;
       renderMarkup(res.hits);
       window.scrollBy({
