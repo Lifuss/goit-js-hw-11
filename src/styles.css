@@ -1,0 +1,117 @@
+/* =========== RESET styles =============*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+/* =========== /RESET styles =============*/
+body {
+  font-family: 'Open Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  background: hsl(187 40% 98%);
+}
+.image {
+  display: block;
+  width: 400px;
+  height: auto;
+}
+.breed-select {
+  max-width: 200px;
+  display: block;
+  margin-bottom: 16px;
+}
+.cat-info {
+  display: flex;
+  --shadowColor: 187 60% 40%;
+  display: flex;
+  flex-wrap: wrap;
+  background: hsl(187 70% 85%);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0.65rem 0.65rem 0 hsl(var(--shadowColor) / 1);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 0.5rem solid;
+}
+.text-box {
+  padding: min(2rem, 5vw) min(2rem, 5vw) min(2.5rem, 5vw);
+  flex: 1 0 50%;
+}
+.desc-title {
+  margin-bottom: 16px;
+}
+.desc-text {
+  margin-bottom: 16px;
+}
+.visually-hidden {
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  margin: -1px;
+}
+
+.loader {
+  border: 2px solid #fff;
+  width: 48px;
+  height: 48px;
+  background: #ff3d00;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 24px solid;
+  border-color: transparent #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
