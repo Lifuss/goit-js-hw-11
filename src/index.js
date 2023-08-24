@@ -2,6 +2,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { getPhotosByWord } from './pixabayAPI';
+import debounce from 'lodash.debounce';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -15,34 +16,55 @@ let currentPage = 1;
 refs.form.addEventListener('submit', onSearchSubmit);
 
 function onSearchSubmit(e) {
+  console.log('onSearchSubmit');
   e.preventDefault();
+  if (!e.target.elements.searchQuery.value) {
+    return Notify.warning('Please enter your search target', {
+      position: 'center-center',
+      clickToClose: true,
+      fontSize: '22px',
+      width: 'fit-content',
+    });
+  }
   refs.gallery.innerHTML = '';
 
   getPhotosByWord(e.target.elements.searchQuery.value)
-    .then(({ res, page }) => {
+    .then(({ hits, totalHits, page }) => {
       currentPage = page;
-      maxPage = Math.ceil(res.totalHits / res.hits.length);
-
-      renderMarkup(res.hits);
+      maxPage = Math.ceil(totalHits / hits.length);
+      renderMarkup(hits);
+      Notify.success(`For the query ${totalHits} images were found`, {
+        clickToClose: true,
+        fontSize: '22px',
+        width: 'fit-content',
+      });
       observer.observe(refs.target);
       updateStatusObserver();
+
       lightbox.refresh();
     })
     .catch(err => {
       Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
+        'Sorry, there are no images matching your search query. Please try again.',
+        {
+          position: 'center-center',
+          clickToClose: true,
+          fontSize: '22px',
+          width: 'fit-content',
+        }
       );
-      console.log(err);
     });
   e.target.reset();
 }
 const observer = new IntersectionObserver(onLoad);
 
 function loadMore() {
+  console.log('loadMore: ');
+
   getPhotosByWord()
-    .then(({ res, page }) => {
+    .then(({ hits, page }) => {
       currentPage = page;
-      renderMarkup(res.hits);
+      renderMarkup(hits);
       window.scrollBy({
         top: 690,
         behavior: 'smooth',
@@ -50,7 +72,7 @@ function loadMore() {
       updateStatusObserver();
       lightbox.refresh();
     })
-    .catch(err => console.log(err));
+    .catch(err => console.log('error on load'));
 }
 
 function onLoad(entries, observer) {
@@ -99,5 +121,20 @@ const lightbox = new SimpleLightbox('.gallery a', {});
 function updateStatusObserver() {
   if (currentPage === maxPage) {
     observer.unobserve(refs.target);
+    document.addEventListener('scroll', debounce(onBottomHit, 300));
+  }
+}
+
+function onBottomHit() {
+  const scrollableHeight =
+    document.documentElement.scrollHeight - window.innerHeight;
+  if (window.scrollY >= scrollableHeight) {
+    Notify.info(`&#127879; you've got to the end of the gallery`, {
+      position: 'center-bottom',
+      clickToClose: true,
+      fontSize: '22px',
+      width: 'fit-content',
+    });
+    document.removeEventListener('scroll', onBottomHit);
   }
 }
