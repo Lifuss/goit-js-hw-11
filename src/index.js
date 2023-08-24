@@ -12,13 +12,14 @@ const refs = {
 
 let maxPage = 1;
 let currentPage = 1;
+let searchedWord = '';
 
 refs.form.addEventListener('submit', onSearchSubmit);
 
 function onSearchSubmit(e) {
-  console.log('onSearchSubmit');
   e.preventDefault();
-  if (!e.target.elements.searchQuery.value) {
+  searchedWord = e.target.elements.searchQuery.value.trim();
+  if (!searchedWord) {
     return Notify.warning('Please enter your search target', {
       position: 'center-center',
       clickToClose: true,
@@ -26,11 +27,16 @@ function onSearchSubmit(e) {
       width: 'fit-content',
     });
   }
+
+  currentPage = 1;
+  maxPage = 1;
   refs.gallery.innerHTML = '';
 
-  getPhotosByWord(e.target.elements.searchQuery.value)
-    .then(({ hits, totalHits, page }) => {
-      currentPage = page;
+  getPhotosByWord(searchedWord, currentPage)
+    .then(({ hits, totalHits }) => {
+      if (totalHits === 0) {
+        throw new Error(err);
+      }
       maxPage = Math.ceil(totalHits / hits.length);
       renderMarkup(hits);
       Notify.success(`For the query ${totalHits} images were found`, {
@@ -59,11 +65,12 @@ function onSearchSubmit(e) {
 const observer = new IntersectionObserver(onLoad);
 
 function loadMore() {
-  console.log('loadMore: ');
-
-  getPhotosByWord()
-    .then(({ hits, page }) => {
-      currentPage = page;
+  if (maxPage === 1) {
+    return;
+  }
+  currentPage += 1;
+  getPhotosByWord(searchedWord)
+    .then(({ hits }) => {
       renderMarkup(hits);
       window.scrollBy({
         top: 690,
